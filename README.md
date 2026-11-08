@@ -3,10 +3,6 @@
 Conway's Game of Life where cells belong to species. A newborn cell takes the
 majority species of its three parents, so populations compete for territory.
 
-Multicell is a spin-off of [Adam Heins' Multicell](https://github.com/adamheins/multicell)
-(2015, MIT). The idea and the original curses implementation are his; this
-project is maintained independently of the original. See [LICENSE](LICENSE).
-
 ## Install and run
 
 Requires Python 3.11 or newer and nothing else. On Linux and macOS the full-screen
@@ -67,7 +63,7 @@ BBB
 blinker in two species), `r-pentomino.txt` (an R-pentomino whose cells are two
 species) and `competing-populations.txt` (two random soups meeting in the middle).
 
-## What this spin-off adds
+## What this remix adds
 
 - An installable package (`multicell`, `multicell-slate`) with no dependencies.
 - A simulation engine separate from the display, with a seedable tie-break and
@@ -89,6 +85,19 @@ scripts/check.sh   # ruff, mypy (strict) and pytest
 A browser version (no server) with painting, species colours and population graphs,
 plus rule variants.
 
+## Related
+
+Mathomaly has interactive explorations of other cellular automata:
+[Rule 30](https://mathomaly.com/explore/rule-30/),
+[Langton's ant](https://mathomaly.com/explore/langton/) and
+[the sandpile](https://mathomaly.com/explore/sandpile/).
+
+## Credits
+
+Multicell is a remix of [Adam Heins' Multicell](https://github.com/adamheins/multicell)
+(2015, MIT), which used the species-inheritance rule in a curses
+implementation. We maintain this rewrite independently of Adam Heins' project.
+
 ## License
 
-MIT. Copyright (c) 2015 Adam Heins, (c) 2026 anphase.
+MIT. Copyright (c) 2015 Adam Heins, (c) 2026 anphase. See [LICENSE](LICENSE).
