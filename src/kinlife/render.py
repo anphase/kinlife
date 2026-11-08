@@ -6,7 +6,7 @@ import time
 from collections import Counter
 from typing import TextIO
 
-from multicell.engine import DEAD, Grid, Simulation
+from kinlife.engine import DEAD, Grid, Simulation
 
 CLEAR = "\x1b[H\x1b[J"
 

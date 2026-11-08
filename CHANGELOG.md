@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## [0.2.0] - 2026-11-08
+
+### Changed
+
+- Renamed to Kinlife: the package is `kinlife`, and the commands are `kinlife` and `kinlife-slate`. The idea and the original curses version are Adam Heins' Multicell (2015, MIT), credited in the README.
 
 ### Added
 

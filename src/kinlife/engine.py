@@ -1,4 +1,4 @@
-"""Pure Multicell simulation: no I/O, no terminal, no global state.
+"""Pure Kinlife simulation: no I/O, no terminal, no global state.
 
 A grid is a tuple of equal-length strings. ``DEAD`` ('.') is an empty cell and
 every other character is a live cell whose character is its species.
@@ -50,7 +50,7 @@ LIFE = RULES["life"]
 
 
 class SeedError(ValueError):
-    """Raised when seed text is not a valid Multicell grid."""
+    """Raised when seed text is not a valid Kinlife grid."""
 
 
 def parse_seed(text: str) -> Grid:

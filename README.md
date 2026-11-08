@@ -1,4 +1,4 @@
-# Multicell
+# Kinlife
 
 Conway's Game of Life where cells belong to species. A newborn cell takes the
 majority species of its three parents, so populations compete for territory.
@@ -10,10 +10,10 @@ UI uses the standard library's `curses`; where that is missing, or when output i
 not a terminal, a plain-text renderer is used.
 
 ```
-git clone https://github.com/anphase/multicell
-cd multicell
+git clone https://github.com/anphase/kinlife
+cd kinlife
 pip install .
-multicell seeds/gosper-gun.txt
+kinlife seeds/gosper-gun.txt
 ```
 
 Keys: `space` or `p` pause, `s` step, `+` / `-` speed, `r` restart, `w` toggle
@@ -22,8 +22,8 @@ each species, each in its own colour.
 
 Options: `-p N` padding (empty cells added around the seed, default 5), `-t SECONDS`
 time between generations, `--wrap` for toroidal edges, `--rng-seed N` for a
-reproducible run, `--plain -n N` to print N generations as text. Run `multicell -h`
-for all of them. `python -m multicell` works too.
+reproducible run, `--plain -n N` to print N generations as text. Run `kinlife -h`
+for all of them. `python -m kinlife` works too.
 
 ## The rules
 
@@ -67,7 +67,7 @@ A seed is a plain text file holding a rectangle of characters, one row per line.
 - `.` (or a space) is an empty cell.
 - Any other character is a live cell, and that character is its species. `A`/`B`,
   `X`/`O` and `1`/`2` all work; use as many species as you like.
-- Every row must be the same width, otherwise Multicell reports which line is wrong.
+- Every row must be the same width, otherwise Kinlife reports which line is wrong.
 - Trailing blank lines are ignored.
 
 ```
@@ -76,14 +76,14 @@ A seed is a plain text file holding a rectangle of characters, one row per line.
 BBB
 ```
 
-`multicell-slate -r 30 -c 80 -o mine.txt` writes a blank rectangle to edit. The
+`kinlife-slate -r 30 -c 80 -o mine.txt` writes a blank rectangle to edit. The
 `seeds/` folder has examples: `glider.txt`, `gosper-gun.txt` (a glider gun and a
 blinker in two species), `r-pentomino.txt` (an R-pentomino whose cells are two
 species) and `competing-populations.txt` (two random soups meeting in the middle).
 
 ## What this remix adds
 
-- An installable package (`multicell`, `multicell-slate`) with no dependencies.
+- An installable package (`kinlife`, `kinlife-slate`) with no dependencies.
 - A simulation engine separate from the display, with a seedable tie-break and
   toroidal edges.
 - Tests that pin down the rules above.
@@ -112,7 +112,7 @@ Mathomaly has interactive explorations of other cellular automata:
 
 ## Credits
 
-Multicell is a remix of [Adam Heins' Multicell](https://github.com/adamheins/multicell)
+Kinlife is a remix of [Adam Heins' Multicell](https://github.com/adamheins/multicell)
 (2015, MIT), which used the species-inheritance rule in a curses
 implementation. We maintain this rewrite independently of Adam Heins' project.
 

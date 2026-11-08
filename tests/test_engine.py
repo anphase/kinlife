@@ -2,7 +2,7 @@ import random
 
 import pytest
 
-from multicell.engine import (
+from kinlife.engine import (
     DEAD,
     DYING,
     RULES,

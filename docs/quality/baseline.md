@@ -4,7 +4,7 @@ Recorded 2026-11-08 at 0.1.0 plus the rule variants (79 tests).
 
 ## Coverage
 
-`pytest --cov=multicell`: 267 statements, 0 missed, **100%** on every module
+`pytest --cov=kinlife`: 267 statements, 0 missed, **100%** on every module
 (`cli`, `engine`, `render`, `slate`, `ui`, `__init__`, `__main__`).
 
 Ratchet: `COV_MIN=100` in `scripts/ci-local.sh`.

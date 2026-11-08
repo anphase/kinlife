@@ -3,12 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from multicell import __version__
-from multicell.cli import main
-from multicell.engine import Simulation, parse_seed
-from multicell.render import frame, population_text, run_plain
-from multicell.slate import main as slate_main
-from multicell.ui import MAX_INTERVAL, MIN_INTERVAL, Session, _wrap_words
+from kinlife import __version__
+from kinlife.cli import main
+from kinlife.engine import Simulation, parse_seed
+from kinlife.render import frame, population_text, run_plain
+from kinlife.slate import main as slate_main
+from kinlife.ui import MAX_INTERVAL, MIN_INTERVAL, Session, _wrap_words
 
 
 @pytest.fixture
@@ -101,7 +101,7 @@ def test_ctrl_c_in_plain_mode_exits_quietly(
     def interrupt(*_args: object, **_kwargs: object) -> None:
         raise KeyboardInterrupt
 
-    monkeypatch.setattr("multicell.cli.run_plain", interrupt)
+    monkeypatch.setattr("kinlife.cli.run_plain", interrupt)
     assert main([str(seed), "--plain"]) == 130
 
 
@@ -257,10 +257,10 @@ def test_python_dash_m_entry_point(seed: Path) -> None:
     import sys
 
     argv = sys.argv
-    sys.argv = ["multicell", str(seed), "--plain", "-n", "0"]
+    sys.argv = ["kinlife", str(seed), "--plain", "-n", "0"]
     try:
         with pytest.raises(SystemExit) as exit_info:
-            runpy.run_module("multicell", run_name="__main__")
+            runpy.run_module("kinlife", run_name="__main__")
     finally:
         sys.argv = argv
     assert exit_info.value.code == 0

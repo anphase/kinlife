@@ -7,8 +7,8 @@ import time
 from collections.abc import Callable
 from typing import Any
 
-from multicell.engine import DEAD, Simulation
-from multicell.render import ordered_population
+from kinlife.engine import DEAD, Simulation
+from kinlife.render import ordered_population
 
 MIN_INTERVAL = 0.005
 MAX_INTERVAL = 2.0

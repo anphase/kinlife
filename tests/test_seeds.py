@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from multicell.engine import Simulation, pad, parse_seed
+from kinlife.engine import Simulation, pad, parse_seed
 
 SEEDS = sorted((Path(__file__).parent.parent / "seeds").glob("*.txt"))
 

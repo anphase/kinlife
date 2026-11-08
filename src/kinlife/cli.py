@@ -1,4 +1,4 @@
-"""``multicell``: run a seed file."""
+"""``kinlife``: run a seed file."""
 
 from __future__ import annotations
 
@@ -6,10 +6,10 @@ import argparse
 import sys
 from pathlib import Path
 
-from multicell import __version__
-from multicell.engine import RULES, SeedError, Simulation, pad, parse_seed
-from multicell.render import run_plain
-from multicell.ui import Session, run_curses
+from kinlife import __version__
+from kinlife.engine import RULES, SeedError, Simulation, pad, parse_seed
+from kinlife.render import run_plain
+from kinlife.ui import Session, run_curses
 
 PADDING = 5
 INTERVAL = 0.05
@@ -18,7 +18,7 @@ GENERATIONS = 50
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="multicell",
+        prog="kinlife",
         description="Run Conway's Game of Life with species from a seed file.",
     )
     parser.add_argument("seed_file", type=Path, help="seed file to run")
@@ -73,7 +73,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _error(message: str) -> int:
-    print(f"multicell: {message}", file=sys.stderr)
+    print(f"kinlife: {message}", file=sys.stderr)
     return 2
 
 
