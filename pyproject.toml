@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "multicell"
+version = "0.1.0"
+description = "Conway's Game of Life with species: a newborn cell takes the majority species of its three parents."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [{ name = "Adam Heins" }, { name = "anphase" }]
+keywords = ["game of life", "cellular automaton", "terminal"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Games/Entertainment :: Simulation",
+  "Environment :: Console",
+]
+dependencies = []
+
+[project.urls]
+Source = "https://github.com/anphase/multicell"
+Original = "https://github.com/adamheins/multicell"
+
+[project.scripts]
+multicell = "multicell.cli:main"
+multicell-slate = "multicell.slate:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=multicell --cov-report=term-missing"
+
+[tool.coverage.report]
+exclude_also = ["if __name__ == .__main__.:"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4", "RUF"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src", "tests"]
