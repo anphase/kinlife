@@ -8,7 +8,7 @@ from collections.abc import Callable
 from typing import Any
 
 from multicell.engine import DEAD, Simulation
-from multicell.render import population_text
+from multicell.render import ordered_population
 
 MIN_INTERVAL = 0.005
 MAX_INTERVAL = 2.0
@@ -57,16 +57,21 @@ class Session:
             f"{self.interval:.3f}s/gen  edges: {edges}"
         )
 
-    def population(self) -> str:
-        return population_text(self.sim.population)
 
+def run_curses(session: Session) -> bool:  # pragma: no cover - needs a terminal
+    """Run ``session`` full screen; False if curses cannot run here.
 
-def run_curses(session: Session) -> None:  # pragma: no cover - needs a terminal
-    """Run ``session`` full screen. curses.wrapper restores the terminal on exit."""
-    import curses
+    curses.wrapper restores the terminal on exit.
+    """
+    try:
+        import curses
+    except ImportError:  # Python built without the _curses extension
+        return False
 
     def loop(screen: Any) -> None:
-        curses.curs_set(0)
+        # Not every terminal can hide the cursor.
+        with contextlib.suppress(curses.error):
+            curses.curs_set(0)
         palette = _init_colours()
         styles: dict[str, int] = {}
         next_step = time.monotonic()
@@ -87,8 +92,12 @@ def run_curses(session: Session) -> None:  # pragma: no cover - needs a terminal
                 session.tick()
                 next_step = time.monotonic() + session.interval
 
-    with contextlib.suppress(KeyboardInterrupt):
-        curses.wrapper(loop)
+    try:
+        with contextlib.suppress(KeyboardInterrupt):
+            curses.wrapper(loop)
+    except curses.error:  # unknown or too-limited TERM
+        return False
+    return True
 
 
 def _init_colours() -> list[int]:  # pragma: no cover - needs a terminal
@@ -149,7 +158,7 @@ def _draw(
     # Header: status, then the population legend wrapped to the window width.
     put(0, 0, session.status())
     x, y = 0, 1
-    ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    ordered = ordered_population(counts)
     if not ordered:
         put(y, 0, "extinct")
     for species, n in ordered:

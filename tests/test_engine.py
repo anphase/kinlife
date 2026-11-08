@@ -206,3 +206,10 @@ def test_parse_empty() -> None:
     for text in ("", "\n\n", "  \n"):
         with pytest.raises(SeedError, match="empty"):
             parse_seed(text)
+
+
+def test_wrap_counts_each_neighbour_once_on_a_thin_torus() -> None:
+    # On a one-row torus the cell above, below and itself all wrap to the same
+    # row; only the two real neighbours may count.
+    assert step((".A.",), wrap=True) == ("...",)
+    assert step(("AAA",), wrap=True) == ("AAA",)

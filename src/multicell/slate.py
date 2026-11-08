@@ -38,8 +38,13 @@ def main(argv: list[str] | None = None) -> int:
         try:
             answer = input(f"The file {out} already exists. Overwrite it? [Y/n] ")
         except EOFError:
-            answer = "n"
+            print(f"multicell-slate: {out} exists; use --force.", file=sys.stderr)
+            return 1
         if answer.strip().lower() not in ("", "y", "yes"):
             return 1
-    out.write_text("".join(row + "\n" for row in blank(args.rows, args.cols)))
+    try:
+        out.write_text("".join(row + "\n" for row in blank(args.rows, args.cols)))
+    except OSError as exc:
+        print(f"multicell-slate: cannot write {out}: {exc.strerror}", file=sys.stderr)
+        return 1
     return 0

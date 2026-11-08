@@ -11,12 +11,16 @@ from multicell.engine import DEAD, Grid, Simulation
 CLEAR = "\x1b[H\x1b[J"
 
 
+def ordered_population(counts: Counter[str]) -> list[tuple[str, int]]:
+    """``(species, count)`` pairs, largest population first."""
+    return sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+
+
 def population_text(counts: Counter[str]) -> str:
     """``A=12 B=30``, largest population first; ``extinct`` when empty."""
     if not counts:
         return "extinct"
-    ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
-    return " ".join(f"{species}={n}" for species, n in ordered)
+    return " ".join(f"{species}={n}" for species, n in ordered_population(counts))
 
 
 def frame(grid: Grid) -> str:

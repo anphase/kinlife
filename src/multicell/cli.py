@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import sys
 from pathlib import Path
 
@@ -83,9 +82,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.generations < 0:
         return _error("--generations must not be negative.")
     try:
-        text = args.seed_file.read_text()
+        text = args.seed_file.read_text(encoding="utf-8-sig")
     except OSError as exc:
         return _error(f"cannot read {args.seed_file}: {exc.strerror}")
+    except UnicodeDecodeError:
+        return _error(f"cannot read {args.seed_file}: not UTF-8 text.")
     try:
         start = pad(parse_seed(text), padding)
     except SeedError as exc:
@@ -95,9 +96,13 @@ def main(argv: list[str] | None = None) -> int:
         return Simulation(start, wrap=args.wrap, seed=args.rng_seed)
 
     interactive = sys.stdin.isatty() and sys.stdout.isatty()
-    if not args.plain and interactive and importlib.util.find_spec("curses"):
-        run_curses(Session(make_sim, args.time_interval))  # pragma: no cover
-    else:
+    if (
+        not args.plain
+        and interactive
+        and run_curses(Session(make_sim, args.time_interval))  # pragma: no cover
+    ):
+        return 0
+    try:
         run_plain(
             make_sim(),
             args.generations,
@@ -105,4 +110,6 @@ def main(argv: list[str] | None = None) -> int:
             sys.stdout,
             live=interactive,
         )
+    except KeyboardInterrupt:
+        return 130
     return 0

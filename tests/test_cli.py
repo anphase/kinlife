@@ -63,6 +63,31 @@ def test_non_rectangular_seed_reports_error(
     assert "not rectangular" in capsys.readouterr().err
 
 
+def test_non_utf8_seed_reports_error(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    bad = tmp_path / "bad.txt"
+    bad.write_bytes(b"A.\n\xff.\n")
+    assert main([str(bad), "--plain"]) == 2
+    assert "not UTF-8" in capsys.readouterr().err
+
+
+def test_utf8_bom_is_ignored(seed: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    seed.write_bytes(b"\xef\xbb\xbf...\n.A.\n...\n")
+    assert main([str(seed), "--plain", "-n", "0", "-p", "0"]) == 0
+    assert "Generation 0  A=1" in capsys.readouterr().out
+
+
+def test_ctrl_c_in_plain_mode_exits_quietly(
+    seed: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def interrupt(*_args: object, **_kwargs: object) -> None:
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr("multicell.cli.run_plain", interrupt)
+    assert main([str(seed), "--plain"]) == 130
+
+
 def test_version(capsys: pytest.CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit):
         main(["--version"])
@@ -122,6 +147,13 @@ def test_slate_overwrite_without_tty_declines(
     assert slate_main(["-o", str(out), "-f", "-r", "1", "-c", "1"]) == 0
 
 
+def test_slate_write_failure_is_reported(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert slate_main(["-o", str(tmp_path / "missing" / "s.txt"), "-f"]) == 1
+    assert "cannot write" in capsys.readouterr().err
+
+
 # --- session ---------------------------------------------------------------
 
 
@@ -179,7 +211,7 @@ def test_session_unknown_key_ignored_and_text() -> None:
     s.handle("z")
     assert not s.paused
     assert s.status().startswith("Generation 0  running")
-    assert s.population() == "A=3"
+    assert population_text(s.sim.population) == "A=3"
 
 
 def test_session_interval_initial_clamp() -> None:

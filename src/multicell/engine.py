@@ -72,19 +72,20 @@ def population(grid: Grid) -> Counter[str]:
 
 def _live_neighbours(grid: Grid, row: int, col: int, wrap: bool) -> list[str]:
     rows, cols = len(grid), len(grid[0])
-    found: list[str] = []
+    # A set, so that on a torus only one or two cells wide a neighbour reached
+    # by wrapping in two directions is counted once, and a cell is never its
+    # own neighbour.
+    seen: set[tuple[int, int]] = set()
     for d_row in (-1, 0, 1):
         for d_col in (-1, 0, 1):
-            if d_row == 0 and d_col == 0:
-                continue
             r, c = row + d_row, col + d_col
             if wrap:
                 r, c = r % rows, c % cols
             elif not (0 <= r < rows and 0 <= c < cols):
                 continue
-            if grid[r][c] != DEAD:
-                found.append(grid[r][c])
-    return found
+            seen.add((r, c))
+    seen.discard((row, col))
+    return [grid[r][c] for r, c in sorted(seen) if grid[r][c] != DEAD]
 
 
 def _inherit(parents: list[str], rng: random.Random) -> str:
