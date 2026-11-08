@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from multicell import __version__
-from multicell.engine import SeedError, Simulation, pad, parse_seed
+from multicell.engine import RULES, SeedError, Simulation, pad, parse_seed
 from multicell.render import run_plain
 from multicell.ui import Session, run_curses
 
@@ -40,6 +40,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--wrap",
         action="store_true",
         help="join opposite edges into a torus instead of treating them as walls",
+    )
+    parser.add_argument(
+        "--rule",
+        choices=sorted(RULES),
+        default="life",
+        help="life (B3/S23, default), highlife (B36/S23), daynight "
+        "(B3678/S34678) or brain (Brian's Brain, three states)",
     )
     parser.add_argument(
         "--rng-seed",
@@ -93,7 +100,9 @@ def main(argv: list[str] | None = None) -> int:
         return _error(f"{args.seed_file}: {exc}")
 
     def make_sim() -> Simulation:
-        return Simulation(start, wrap=args.wrap, seed=args.rng_seed)
+        return Simulation(
+            start, wrap=args.wrap, seed=args.rng_seed, rule=RULES[args.rule]
+        )
 
     interactive = sys.stdin.isatty() and sys.stdout.isatty()
     if (

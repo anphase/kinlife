@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Added
+
+- 2026-11-08: `--rule` flag with HighLife (B36/S23), Day and Night
+  (B3678/S34678) and Brian's Brain (three states, dying cells shown as `~`);
+  species inheritance applies to births in each, with a random tie-break.
+
 ### Fixed
 
 - 2026-11-08: restarting with `r` keeps the current wrap setting instead of
