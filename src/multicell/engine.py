@@ -8,10 +8,45 @@ from __future__ import annotations
 
 import random
 from collections import Counter
+from dataclasses import dataclass
 
 DEAD = "."
+# A dying cell in Brian's Brain. It has no species and counts as no neighbour.
+DYING = "~"
 
 Grid = tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class Rule:
+    """A birth/survival rule over the eight neighbours, or Brian's Brain.
+
+    ``birth`` and ``survive`` are the live-neighbour counts at which an empty
+    cell is born and a live cell survives. A ``brain`` rule has three states
+    (empty, live, dying): a live cell always becomes dying, a dying cell
+    becomes empty, and an empty cell is born by ``birth``; ``survive`` is unused.
+    """
+
+    name: str
+    birth: frozenset[int]
+    survive: frozenset[int]
+    brain: bool = False
+
+
+RULES: dict[str, Rule] = {
+    rule.name: rule
+    for rule in (
+        Rule("life", frozenset({3}), frozenset({2, 3})),
+        Rule("highlife", frozenset({3, 6}), frozenset({2, 3})),
+        Rule(
+            "daynight",
+            frozenset({3, 6, 7, 8}),
+            frozenset({3, 4, 6, 7, 8}),
+        ),
+        Rule("brain", frozenset({2}), frozenset(), brain=True),
+    )
+}
+LIFE = RULES["life"]
 
 
 class SeedError(ValueError):
@@ -67,6 +102,7 @@ def population(grid: Grid) -> Counter[str]:
     for row in grid:
         counts.update(row)
     del counts[DEAD]
+    del counts[DYING]
     return counts
 
 
@@ -85,23 +121,31 @@ def _live_neighbours(grid: Grid, row: int, col: int, wrap: bool) -> list[str]:
                 continue
             seen[r, c] = None
     seen.pop((row, col), None)
-    return [grid[r][c] for r, c in seen if grid[r][c] != DEAD]
+    return [grid[r][c] for r, c in seen if grid[r][c] not in (DEAD, DYING)]
 
 
 def _inherit(parents: list[str], rng: random.Random) -> str:
-    """Species of a newborn: the majority of its three parents, else random."""
-    species, count = Counter(parents).most_common(1)[0]
-    return species if count >= 2 else rng.choice(parents)
+    """Species of a newborn: the species with most parents, a tie broken at random."""
+    counts = Counter(parents)
+    top = max(counts.values())
+    leaders = [species for species, n in counts.items() if n == top]
+    return leaders[0] if len(leaders) == 1 else rng.choice(leaders)
 
 
-def step(grid: Grid, *, wrap: bool = False, rng: random.Random | None = None) -> Grid:
-    """Return the next generation.
+def step(
+    grid: Grid,
+    *,
+    wrap: bool = False,
+    rng: random.Random | None = None,
+    rule: Rule = LIFE,
+) -> Grid:
+    """Return the next generation under ``rule`` (Conway's Life by default).
 
-    A live cell survives with 2 or 3 live neighbours and dies otherwise. An
-    empty cell with exactly 3 live neighbours is born with the majority species
-    of those three, or a species chosen with ``rng`` when all three differ. With
-    ``wrap`` the edges join up (a torus); otherwise cells beyond the edge are
-    empty.
+    A live cell survives when its live-neighbour count is in ``rule.survive``
+    and dies otherwise. An empty cell whose count is in ``rule.birth`` is born
+    with the species most common among its parents, or one of the tied species
+    chosen with ``rng``. With ``wrap`` the edges join up (a torus); otherwise
+    cells beyond the edge are empty. Brian's Brain: see ``Rule``.
     """
     if not grid or not grid[0]:
         return grid
@@ -111,9 +155,13 @@ def step(grid: Grid, *, wrap: bool = False, rng: random.Random | None = None) ->
         cells: list[str] = []
         for col, cell in enumerate(line):
             neighbours = _live_neighbours(grid, row, col, wrap)
-            if cell != DEAD:
-                cells.append(cell if len(neighbours) in (2, 3) else DEAD)
-            elif len(neighbours) == 3:
+            if cell == DYING:
+                cells.append(DEAD)
+            elif cell != DEAD and rule.brain:
+                cells.append(DYING)
+            elif cell != DEAD:
+                cells.append(cell if len(neighbours) in rule.survive else DEAD)
+            elif len(neighbours) in rule.birth:
                 cells.append(_inherit(neighbours, rng))
             else:
                 cells.append(DEAD)
@@ -125,9 +173,15 @@ class Simulation:
     """A grid plus the settings and random state needed to advance it."""
 
     def __init__(
-        self, grid: Grid, *, wrap: bool = False, seed: int | None = None
+        self,
+        grid: Grid,
+        *,
+        wrap: bool = False,
+        seed: int | None = None,
+        rule: Rule = LIFE,
     ) -> None:
         self.grid = grid
+        self.rule = rule
         self.wrap = wrap
         self.generation = 0
         self._rng = random.Random(seed)
@@ -137,5 +191,5 @@ class Simulation:
         return population(self.grid)
 
     def step(self) -> None:
-        self.grid = step(self.grid, wrap=self.wrap, rng=self._rng)
+        self.grid = step(self.grid, wrap=self.wrap, rng=self._rng, rule=self.rule)
         self.generation += 1

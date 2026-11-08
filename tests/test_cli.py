@@ -38,6 +38,23 @@ def test_wrap_and_rng_seed_flags(
     assert capsys.readouterr().out == first
 
 
+def test_rule_flag_runs_brians_brain(
+    seed: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert main([str(seed), "--plain", "-n", "2", "-p", "0", "--rule", "brain"]) == 0
+    out = capsys.readouterr().out
+    # The live cell becomes dying (no species counted), then empty.
+    assert "Generation 1  extinct" in out
+    assert "|.~.|" not in out  # empty cells print as spaces
+    assert "| ~ |" in out
+
+
+def test_unknown_rule_rejected(seed: Path) -> None:
+    with pytest.raises(SystemExit) as exc:
+        main([str(seed), "--rule", "nope"])
+    assert exc.value.code == 2
+
+
 @pytest.mark.parametrize(
     "args",
     [["-p", "-1"], ["-t", "-1"], ["-n", "-1"]],

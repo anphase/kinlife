@@ -42,6 +42,24 @@ cells update at once.
 With a single species this is exactly Conway's Game of Life. The random choice
 in rule 3 is the only randomness; `--rng-seed` makes it reproducible.
 
+### Rule variants
+
+`--rule NAME` swaps the survival and birth counts (the default is `life`). In
+every variant a newborn takes the species with the most parents, and a tie
+(for example three A and three B parents) is broken at random.
+
+| `--rule`   | Rule                  | Born with N neighbours | Survives with N neighbours |
+| ---------- | --------------------- | ---------------------- | -------------------------- |
+| `life`     | B3/S23                | 3                      | 2, 3                       |
+| `highlife` | B36/S23               | 3, 6                   | 2, 3                       |
+| `daynight` | B3678/S34678          | 3, 6, 7, 8             | 3, 4, 6, 7, 8              |
+| `brain`    | Brian's Brain         | exactly 2              | never                      |
+
+Brian's Brain has three states. A live cell always becomes *dying* (shown as
+`~`) for one generation and then empty, and a dying cell neither counts as a
+neighbour nor has a species. `~` is therefore reserved; it is not counted in the
+population.
+
 ## Seed format
 
 A seed is a plain text file holding a rectangle of characters, one row per line.

@@ -4,6 +4,8 @@ import pytest
 
 from multicell.engine import (
     DEAD,
+    DYING,
+    RULES,
     Grid,
     SeedError,
     Simulation,
@@ -213,3 +215,128 @@ def test_wrap_counts_each_neighbour_once_on_a_thin_torus() -> None:
     # row; only the two real neighbours may count.
     assert step((".A.",), wrap=True) == ("...",)
     assert step(("AAA",), wrap=True) == ("AAA",)
+
+
+# --- Rule variants ---------------------------------------------------------
+
+
+def cells(g: Grid) -> list[tuple[int, int]]:
+    return trim(g)
+
+
+def neighbours_grid(count: int, *, centre: str = DEAD, species: str = "X") -> Grid:
+    """A 3x3 grid whose centre is ``centre`` and with ``count`` live neighbours."""
+    ring = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1), (2, 2)]
+    rows = [[DEAD] * 3 for _ in range(3)]
+    rows[1][1] = centre
+    for r, c in ring[:count]:
+        rows[r][c] = species
+    return tuple("".join(row) for row in rows)
+
+
+def centre_after(g: Grid, rule_name: str) -> str:
+    return step(g, rule=RULES[rule_name], rng=random.Random(0))[1][1]
+
+
+@pytest.mark.parametrize(
+    ("rule", "birth", "survive"),
+    [
+        ("life", {3}, {2, 3}),
+        ("highlife", {3, 6}, {2, 3}),
+        ("daynight", {3, 6, 7, 8}, {3, 4, 6, 7, 8}),
+    ],
+)
+def test_birth_survival_tables(rule: str, birth: set[int], survive: set[int]) -> None:
+    for n in range(9):
+        born = centre_after(neighbours_grid(n), rule) != DEAD
+        kept = centre_after(neighbours_grid(n, centre="X"), rule) != DEAD
+        assert born == (n in birth), (rule, n)
+        assert kept == (n in survive), (rule, n)
+
+
+def test_default_rule_is_life() -> None:
+    g = pad(grid(".XX.", "XX..", ".X.."), 1)
+    assert step(g, rng=random.Random(1)) == step(
+        g, rule=RULES["life"], rng=random.Random(1)
+    )
+
+
+def test_highlife_replicator_copies_itself() -> None:
+    seed = pad(grid("..XXX", ".X..X", "X...X", "X..X.", "XXX.."), 12)
+    g = seed
+    for _ in range(12):
+        g = step(g, rule=RULES["highlife"])
+    # After 12 generations the replicator has produced a second copy: twice the cells.
+    assert len(cells(g)) == 2 * len(cells(seed))
+
+
+def test_daynight_is_symmetric_under_inversion() -> None:
+    # Day and Night is self-complementary: on a torus, swapping live and empty
+    # commutes with a step.
+    def invert(g: Grid) -> Grid:
+        return tuple("".join("X" if ch == DEAD else DEAD for ch in row) for row in g)
+
+    g = grid("XX.X.", ".X..X", "...XX", "X.X..")
+    rule = RULES["daynight"]
+    assert step(invert(g), wrap=True, rule=rule) == invert(
+        step(g, wrap=True, rule=rule)
+    )
+
+
+def test_birth_inheritance_in_highlife_six_parents() -> None:
+    # Six parents, four A and two B: the plurality species A is born, always.
+    parents = ("AAA", "A.B", "B..")
+    for seed in range(20):
+        assert (
+            step(parents, rule=RULES["highlife"], rng=random.Random(seed))[1][1] == "A"
+        )
+
+
+def test_birth_tie_between_two_species_is_random_but_seeded() -> None:
+    # Six parents split 3 A / 3 B: a tie, so both species appear across seeds.
+    tie = ("AAA", "B.B", "B..")
+    seen = {
+        step(tie, rule=RULES["highlife"], rng=random.Random(s))[1][1] for s in range(40)
+    }
+    assert seen == {"A", "B"}
+    again = [
+        step(tie, rule=RULES["highlife"], rng=random.Random(5))[1][1] for _ in range(3)
+    ]
+    assert len(set(again)) == 1
+
+
+def test_brain_cycle_on_dying_empty() -> None:
+    g = ("...", ".A.", "...")
+    one = step(g, rule=RULES["brain"])
+    assert one == ("...", ".~.", "...")
+    assert step(one, rule=RULES["brain"]) == blank(3, 3)
+
+
+def test_brain_birth_needs_exactly_two_live_neighbours() -> None:
+    for n in range(9):
+        out = centre_after(neighbours_grid(n), "brain")
+        assert (out != DEAD) == (n == 2), n
+
+
+def test_brain_dying_cells_are_not_neighbours() -> None:
+    # Two dying cells beside an empty cell do not cause a birth.
+    g = ("~.~", "...", "...")
+    assert step(g, rule=RULES["brain"])[0][1] == DEAD
+
+
+def test_brain_birth_inherits_species_of_parents() -> None:
+    same = ("A.A", "...", "...")
+    assert step(same, rule=RULES["brain"], rng=random.Random(0))[0][1] == "A"
+    mixed = ("A.B", "...", "...")
+    seen = {
+        step(mixed, rule=RULES["brain"], rng=random.Random(s))[0][1] for s in range(30)
+    }
+    assert seen == {"A", "B"}
+
+
+def test_brain_wrap_and_population_ignores_dying() -> None:
+    g = ("A.", "..")
+    sim = Simulation(g, wrap=True, rule=RULES["brain"])
+    sim.step()
+    assert sim.grid[0][0] == DYING
+    assert sim.population == {}
