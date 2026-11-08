@@ -4,6 +4,9 @@
 
 ### Added
 
+- 2026-11-08: quality baselines in `docs/quality/baseline.md` (100% coverage,
+  complexity ranking) and `scripts/ci-local.sh`, which ratchets coverage at
+  100% and function complexity at 13.
 - 2026-11-08: `--rule` flag with HighLife (B36/S23), Day and Night
   (B3678/S34678) and Brian's Brain (three states, dying cells shown as `~`);
   species inheritance applies to births in each, with a random tie-break.
