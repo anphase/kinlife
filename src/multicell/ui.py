@@ -45,7 +45,9 @@ class Session:
         elif key in ("-", "_"):
             self.interval = min(MAX_INTERVAL, self.interval * SPEED_FACTOR)
         elif key in ("r", "R"):
+            wrap = self.sim.wrap
             self.sim = self._make_sim()
+            self.sim.wrap = wrap
         elif key in ("w", "W"):
             self.sim.wrap = not self.sim.wrap
 

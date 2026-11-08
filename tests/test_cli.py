@@ -206,6 +206,18 @@ def test_session_restart_toggle_wrap_quit() -> None:
     assert s.quit
 
 
+def test_session_restart_keeps_current_wrap_setting() -> None:
+    s = make_session()
+    s.handle("w")
+    assert s.sim.wrap
+    s.handle("r")
+    assert s.sim.generation == 0
+    assert s.sim.wrap
+    s.handle("w")
+    s.handle("r")
+    assert not s.sim.wrap
+
+
 def test_session_unknown_key_ignored_and_text() -> None:
     s = make_session()
     s.handle("z")

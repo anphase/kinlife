@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- 2026-11-08: restarting with `r` keeps the current wrap setting instead of
+  resetting to the `--wrap` command-line value.
+
 ## 0.1.0
 
 First release of the spin-off, based on Adam Heins' 2015 Multicell.
