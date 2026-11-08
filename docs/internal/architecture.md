@@ -13,7 +13,7 @@ queue, and nothing is deployed yet.
 | Data stores | None. Seed files are read from disk (`seeds/*.txt` or a user file); `kinlife-slate` writes one seed file. |
 | Queues | None. |
 | External dependencies | None at runtime (`dependencies = []`); `curses` from the standard library for the full-screen UI. Dev only: pytest, pytest-cov, ruff, mypy. |
-| Deploy targets | None. Distributed as a source repo (github.com/anphase/kinlife); a PyPI release is pending owner credentials. A static browser version (Cloudflare Pages) is planned, not built. |
+| Deploy targets | None. Distributed as a source repo (github.com/anphase/kinlife); a PyPI release is planned. A static browser version (Cloudflare Pages) is planned, not built. |
 | Machines | None dedicated. Runs wherever Python 3.11+ runs; `scripts/ci-local.sh` is the local gate. |
 
 ## Diagram

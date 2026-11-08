@@ -112,9 +112,8 @@ Mathomaly has interactive explorations of other cellular automata:
 
 ## Credits
 
-Kinlife is a remix of [Adam Heins' Multicell](https://github.com/adamheins/multicell)
-(2015, MIT), which used the species-inheritance rule in a curses
-implementation. We maintain this rewrite independently of Adam Heins' project.
+Kinlife started from [Adam Heins' Multicell](https://github.com/adamheins/multicell) (2015, MIT),
+which first combined Life with species inheritance.
 
 ## License
 
