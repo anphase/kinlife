@@ -72,10 +72,10 @@ def population(grid: Grid) -> Counter[str]:
 
 def _live_neighbours(grid: Grid, row: int, col: int, wrap: bool) -> list[str]:
     rows, cols = len(grid), len(grid[0])
-    # A set, so that on a torus only one or two cells wide a neighbour reached
-    # by wrapping in two directions is counted once, and a cell is never its
-    # own neighbour.
-    seen: set[tuple[int, int]] = set()
+    # Keyed by coordinate, so that on a torus only one or two cells wide a
+    # neighbour reached by wrapping in two directions is counted once, and a cell
+    # is never its own neighbour.
+    seen: dict[tuple[int, int], None] = {}
     for d_row in (-1, 0, 1):
         for d_col in (-1, 0, 1):
             r, c = row + d_row, col + d_col
@@ -83,9 +83,9 @@ def _live_neighbours(grid: Grid, row: int, col: int, wrap: bool) -> list[str]:
                 r, c = r % rows, c % cols
             elif not (0 <= r < rows and 0 <= c < cols):
                 continue
-            seen.add((r, c))
-    seen.discard((row, col))
-    return [grid[r][c] for r, c in sorted(seen) if grid[r][c] != DEAD]
+            seen[r, c] = None
+    seen.pop((row, col), None)
+    return [grid[r][c] for r, c in seen if grid[r][c] != DEAD]
 
 
 def _inherit(parents: list[str], rng: random.Random) -> str:
