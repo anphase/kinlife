@@ -22,7 +22,8 @@ def parse_seed(text: str) -> Grid:
     """Parse seed text into a grid.
 
     '.' and any whitespace are empty cells; any other character is a species.
-    Trailing blank lines (no characters, or only spaces) are ignored. Every row must have the same width.
+    Trailing blank lines (empty or only spaces) are ignored. Every row must
+    have the same width.
     """
     raw = text.splitlines()
     while raw and not raw[-1].strip():
@@ -56,9 +57,7 @@ def pad(grid: Grid, margin: int) -> Grid:
     side = DEAD * margin
     edge = DEAD * (len(grid[0]) + 2 * margin)
     return (
-        (edge,) * margin
-        + tuple(side + row + side for row in grid)
-        + (edge,) * margin
+        (edge,) * margin + tuple(side + row + side for row in grid) + (edge,) * margin
     )
 
 
