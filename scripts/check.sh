@@ -3,7 +3,10 @@
 set -eu
 cd "$(dirname "$0")/.."
 
-python -m ruff check .
-python -m ruff format --check .
-python -m mypy
-python -m pytest -q
+# Prefer the repo's own virtual environment when there is one.
+if [ -x .venv/bin/python ]; then PY=.venv/bin/python; else PY=python3; fi
+
+"$PY" -m ruff check .
+"$PY" -m ruff format --check .
+"$PY" -m mypy
+"$PY" -m pytest -q
