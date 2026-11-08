@@ -143,9 +143,13 @@ def _draw(
     height, width = win.getmaxyx()
 
     def put(y: int, x: int, text: str, attr: int = 0) -> None:
-        # writing the bottom-right cell raises; harmless
+        # Clip to the line instead of letting curses wrap into the next row;
+        # writing the bottom-right cell raises, which is harmless.
+        room = width - x
+        if y >= height or room <= 0:
+            return
         with contextlib.suppress(curses.error):
-            win.addstr(y, x, text, attr)
+            win.addnstr(y, x, text, room, attr)
 
     grid = session.sim.grid
     counts = session.sim.population
