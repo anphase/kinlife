@@ -8,6 +8,7 @@
 
 ### Added
 
+- 2026-11-08: `docs/internal/architecture.md` with a component diagram.
 - 2026-11-08: quality baselines in `docs/quality/baseline.md` (100% coverage,
   complexity ranking) and `scripts/ci-local.sh`, which ratchets coverage at
   100% and function complexity at 13.
