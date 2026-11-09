@@ -1,6 +1,9 @@
 # Quality baseline
 
 Recorded 2026-11-08 at 0.1.0 plus the rule variants (79 tests).
+Re-measured 2026-11-09 at 0.2.0, after the rename to Kinlife: every number
+below is unchanged, and `scripts/ci-local.sh` passes at `CC_MAX=13` and fails
+at 12 (`ui._draw`).
 
 ## Coverage
 
