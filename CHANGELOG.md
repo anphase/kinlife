@@ -16,6 +16,10 @@
   (B3678/S34678) and Brian's Brain (three states, dying cells shown as `~`);
   species inheritance applies to births in each, with a random tie-break.
 
+### Removed
+
+- 2026-11-12: `docs/internal/architecture.md`; the public repo carries no internal docs.
+
 ### Fixed
 
 - 2026-11-08: restarting with `r` keeps the current wrap setting instead of
