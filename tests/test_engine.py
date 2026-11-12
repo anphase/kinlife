@@ -204,6 +204,18 @@ def test_parse_non_rectangular() -> None:
         parse_seed("A.\nB..\n")
 
 
+def test_parse_rejects_control_and_invisible_characters() -> None:
+    # A shared seed file must not be able to drive the terminal it is shown on
+    # (escape sequences, bell, bidi overrides), so only printable cells parse.
+    for bad in ("\x1b", "\x07", "\x00", "\x7f", "\u202e", "\u200b"):
+        with pytest.raises(SeedError, match=r"line 2, column 2: .*U\+[0-9A-F]{4}"):
+            parse_seed(f"...\n.{bad}.\n")
+
+
+def test_parse_accepts_printable_unicode_species() -> None:
+    assert parse_seed("é.\n.🦊\n") == ("é.", ".🦊")
+
+
 def test_parse_empty() -> None:
     for text in ("", "\n\n", "  \n"):
         with pytest.raises(SeedError, match="empty"):

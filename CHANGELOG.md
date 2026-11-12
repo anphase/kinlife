@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- 2026-11-13: seed files containing control or invisible characters (terminal
+  escape sequences, bell, bidi overrides) are now rejected with the line,
+  column and code point, instead of being written raw to the terminal.
+- 2026-11-13: correct the seed documentation to describe Kinlife's rejection of
+  non-printable species characters; whitespace, including tabs, stays an empty
+  cell.
+
 ## [0.2.0] - 2026-11-08
 
 ### Changed

@@ -65,8 +65,10 @@ population.
 A seed is a plain text file holding a rectangle of characters, one row per line.
 
 - `.` (or a space) is an empty cell.
-- Any other character is a live cell, and that character is its species. `A`/`B`,
-  `X`/`O` and `1`/`2` all work; use as many species as you like.
+- Kinlife treats every other printable character as a live cell whose species is
+  that character. `A`/`B`, `X`/`O` and `1`/`2` all work; use as many species as you
+  like. Kinlife treats whitespace as empty cells and rejects non-printable species
+  characters, including escape characters and bidi overrides.
 - Every row must be the same width, otherwise Kinlife reports which line is wrong.
 - Trailing blank lines are ignored.
 

@@ -80,6 +80,18 @@ def test_non_rectangular_seed_reports_error(
     assert "not rectangular" in capsys.readouterr().err
 
 
+def test_escape_sequence_in_seed_is_rejected_not_printed(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    bad = tmp_path / "bad.txt"
+    bad.write_text("........\n\x1b]0;X\x07..\n........\n")
+    assert main([str(bad), "--plain", "-n", "0"]) == 2
+    captured = capsys.readouterr()
+    assert "U+001B" in captured.err
+    assert "\x1b" not in captured.out + captured.err
+    assert "\x07" not in captured.out + captured.err
+
+
 def test_non_utf8_seed_reports_error(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

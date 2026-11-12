@@ -56,7 +56,9 @@ class SeedError(ValueError):
 def parse_seed(text: str) -> Grid:
     """Parse seed text into a grid.
 
-    '.' and any whitespace are empty cells; any other character is a species.
+    '.' and any whitespace are empty cells; any other printable character is a
+    species. Control and invisible characters (escape, bell, bidi overrides)
+    are rejected so a seed file cannot drive the terminal it is shown on.
     Trailing blank lines (empty or only spaces) are ignored. Every row must
     have the same width.
     """
@@ -68,6 +70,12 @@ def parse_seed(text: str) -> Grid:
         raise SeedError("Seed is empty: it has no rows.")
     width = len(lines[0])
     for number, line in enumerate(lines, start=1):
+        for column, ch in enumerate(line, start=1):
+            if not ch.isprintable():
+                raise SeedError(
+                    f"Seed has an unprintable character at line {number}, "
+                    f"column {column}: U+{ord(ch):04X}."
+                )
         if len(line) != width:
             raise SeedError(
                 f"Seed is not rectangular: line {number} has {len(line)} "
